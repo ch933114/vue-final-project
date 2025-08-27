@@ -71,32 +71,27 @@ const loginAction = async () => {
     passwordError.value = ''
   }
 
-  if (hasError) return // 有錯誤就不送出
+  if (hasError) return
 
   try {
     const response = await axios.post(`${api}users/sign_in`, loginData.value)
+    console.log(response.data)
 
     // 把 token 與使用者資訊存進 Pinia
-    console.log(response)
     userStore.setUser(response.data.nickname, response.data.token)
 
     document.cookie = `customTodoToken=${response.data.token};path=/`
     document.cookie = `nickname=${response.data.nickname}; path=/;`
     loginRes.value = '登入成功'
     alert(loginRes.value)
-    // 跳轉頁面
     setTimeout(() => {
       router.push('/todolist')
     }, 0)
   } catch (err) {
-    // AxiosError 物件的正確存取方式
     if (err.response && err.response.data) {
       const data = err.response.data
-
-      // 只顯示第一個錯誤訊息
       alert(data.message)
     } else {
-      // 沒有 response，可能是網路問題
       alert(err.message)
     }
   }
@@ -108,10 +103,12 @@ const changeLoginView = () => {
 }
 
 onMounted(() => {
-  userStore.initUser() // 從 cookie 讀取 token 與 nickname
+  // 從 cookie 讀取 token 與 nickname
+  userStore.initUser()
 
   if (userStore.isLoggedIn) {
-    router.push('/todolist') // 已登入就直接跳轉
+    // 已登入就直接跳轉
+    router.push('/todolist')
   }
 })
 </script>

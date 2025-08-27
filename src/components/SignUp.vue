@@ -101,7 +101,7 @@ const SignUpAction = async () => {
     passwordError.value = ''
   }
 
-  if (hasError) return // 有錯誤就不送出
+  if (hasError) return
 
   // 打註冊 api
   try {
@@ -111,14 +111,10 @@ const SignUpAction = async () => {
     alert(SignUpRes.value)
     emit('changeLoginView')
   } catch (err) {
-    // AxiosError 物件的正確存取方式
     if (err.response && err.response.data) {
       const data = err.response.data
-
-      // 只顯示第一個錯誤訊息
       alert(data.message)
     } else {
-      // 沒有 response，可能是網路問題
       alert(err.message)
     }
   }

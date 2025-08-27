@@ -1,22 +1,22 @@
 <template>
   <div class="max-w-[960px] mx-auto p-4">
-    <div class="flex justify-between bg-white rounded-[10px] overflow-hidden">
+    <div class="flex justify-between bg-white rounded-[10px] overflow-hidden shadow-md">
       <input
         type="text"
         placeholder="新增待辦事項"
         class="px-[16px] py-[12px] w-full focus:outline-none"
-        v-model="newTodo.des"
+        v-model="newTodo"
       />
       <button
         class="text-white text-xl bg-black px-3 py-1 m-2 rounded-[5px]"
-        @click="addTodo(newTodo)"
+        @click="addTodoHandler(newTodo)"
       >
         +
       </button>
     </div>
     <div
       v-if="todoData.length !== 0"
-      class="flex flex-col items-center mt-[16px] rounded-[10px] overflow-hidden bg-white"
+      class="flex flex-col items-center mt-[16px] rounded-[10px] overflow-hidden bg-white shadow-md"
     >
       <div class="flex w-full">
         <button
@@ -33,10 +33,45 @@
         <ul>
           <li class="flex justify-between mx-[24px]" v-for="item in filteredTodos" :key="item.id">
             <div class="flex items-center gap-2 w-full border-b-2 py-[24px]">
-              <input type="checkbox" v-model="item.done" class="w-[20px] h-[20px]" />
-              <p :class="item.done === true ? 'text-gray-400 line-through' : ''">{{ item.des }}</p>
+              <input
+                type="checkbox"
+                v-model="item.status"
+                @change="toggleStatus(item)"
+                class="w-[20px] h-[20px]"
+              />
+
+              <!-- 編輯中顯示 input，一般狀態顯示 p -->
+              <template v-if="item.isEditing">
+                <input v-model="item.content" class="border px-2 py-1 rounded" />
+              </template>
+              <template v-else>
+                <p :class="item.status ? 'text-gray-400 line-through' : ''">{{ item.content }}</p>
+              </template>
             </div>
-            <button class="p-[24px]" @click="removeTodo(item)">X</button>
+
+            <!-- 按鈕區 -->
+            <div class="flex gap-2 items-center">
+              <button
+                v-if="item.isEditing"
+                @click="saveEdit(item)"
+                class="p-[8px] h-[40px] bg-green-500 text-white rounded"
+              >
+                SAVE
+              </button>
+              <button
+                v-else
+                @click="editTodo(item)"
+                class="p-[8px] h-[40px] bg-blue-500 text-white rounded"
+              >
+                EDIT
+              </button>
+              <button
+                @click="removeTodo(item)"
+                class="py-[8px] px-[16px] h-[40px] bg-red-500 text-white rounded"
+              >
+                DELETE
+              </button>
+            </div>
           </li>
         </ul>
         <div class="flex justify-between mx-[24px]">
@@ -53,17 +88,27 @@
   </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useTodolistStore } from '@/stores/todoList'
 import { storeToRefs } from 'pinia'
 
 const todoListStore = useTodolistStore()
-const { addTodo, removeTodo } = todoListStore
+const { addTodo, removeTodo, fetchTodos, toggleStatus, updateTodo } = todoListStore
 const { todoData, undoneTodo } = storeToRefs(todoListStore)
-const newTodo = ref({
-  des: '',
-  done: false,
-})
+const newTodo = ref('')
+
+const editTodo = (item) => {
+  item.isEditing = true
+}
+
+const saveEdit = async (item) => {
+  try {
+    await updateTodo(item)
+    item.isEditing = false
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 const tabs = [
   { label: '全部', value: 'all' },
@@ -71,15 +116,30 @@ const tabs = [
   { label: '已完成', value: 'done' },
 ]
 
+const addTodoHandler = (item) => {
+  if (item === '') {
+    window.alert('請填寫待辦事項內容')
+    return
+  }
+  addTodo(item)
+  newTodo.value = ''
+}
+
 const currentTab = ref('all')
 
 const filteredTodos = computed(() => {
   if (currentTab.value === 'pending') {
-    return todoData.value.filter((item) => item.done === false)
+    return todoData.value.filter((item) => item.status === false)
   } else if (currentTab.value === 'done') {
-    return todoData.value.filter((item) => item.done === true)
+    return todoData.value.filter((item) => item.status === true)
   } else {
     return todoData.value
   }
+})
+
+console.log(filteredTodos.value)
+
+onMounted(() => {
+  fetchTodos()
 })
 </script>
