@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', () => {
 
   const initUser = () => {
     const savedToken = getCookie('customTodoToken')
-    const nickname = getCookie('nickname')
+    const nickname = getCookie('nickname') || null
     if (savedToken && nickname) {
       token.value = savedToken
       user.value = { nickname }

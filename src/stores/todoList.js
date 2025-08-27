@@ -80,7 +80,7 @@ export const useTodolistStore = defineStore('todoList', () => {
   // 更新 todo 的 content
   const updateTodo = async (item) => {
     try {
-      const res = await axios.put(
+      await axios.put(
         `${url}/todos/${item.id}`,
         { content: item.content },
         {
@@ -89,13 +89,10 @@ export const useTodolistStore = defineStore('todoList', () => {
           },
         },
       )
-
-      const updatedTodo = res.data.data
-      todoData.value = todoData.value.map((todo) =>
-        todo.id === updatedTodo.id ? updatedTodo : todo,
-      )
+      const target = todoData.value.find((a) => a.id === item.id)
+      if (target) target.content = item.content
     } catch (err) {
-      console.error('Error:', err.response?.data || err.message)
+      console.error(err)
     }
   }
 

@@ -42,7 +42,7 @@
 
               <!-- 編輯中顯示 input，一般狀態顯示 p -->
               <template v-if="item.isEditing">
-                <input v-model="item.content" class="border px-2 py-1 rounded" />
+                <input v-model="item.content" class="border w-[80%] px-2 py-1 rounded" />
               </template>
               <template v-else>
                 <p :class="item.status ? 'text-gray-400 line-through' : ''">{{ item.content }}</p>
