@@ -75,8 +75,6 @@ const loginAction = async () => {
 
   try {
     const response = await axios.post(`${api}users/sign_in`, loginData.value)
-    console.log(response.data)
-
     // 把 token 與使用者資訊存進 Pinia
     userStore.setUser(response.data.nickname, response.data.token)
 

@@ -137,8 +137,6 @@ const filteredTodos = computed(() => {
   }
 })
 
-console.log(filteredTodos.value)
-
 onMounted(() => {
   fetchTodos()
 })

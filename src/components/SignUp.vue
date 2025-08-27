@@ -105,8 +105,7 @@ const SignUpAction = async () => {
 
   // 打註冊 api
   try {
-    const response = await axios.post(`${api}users/sign_up`, SignUpData.value)
-    console.log(response)
+    await axios.post(`${api}users/sign_up`, SignUpData.value)
     SignUpRes.value = '註冊成功，請嘗試登入'
     alert(SignUpRes.value)
     emit('changeLoginView')
