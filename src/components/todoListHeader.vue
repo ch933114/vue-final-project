@@ -20,7 +20,6 @@ const { user } = storeToRefs(userStore)
 const logoutAction = () => {
   // 清空 store 與 cookie
   logout()
-
   // 跳轉回登入頁
   router.push('/')
 }

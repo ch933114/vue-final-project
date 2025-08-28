@@ -59,8 +59,12 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { useTodolistStore } from '@/stores/todoList'
+import { storeToRefs } from 'pinia'
 
 const api = 'https://todolist-api.hexschool.io/'
+const todolistStore = useTodolistStore()
+const { loading } = storeToRefs(todolistStore)
 
 const SignUpData = ref({
   email: '',
@@ -103,6 +107,8 @@ const SignUpAction = async () => {
 
   if (hasError) return
 
+  loading.value = true
+
   // 打註冊 api
   try {
     await axios.post(`${api}users/sign_up`, SignUpData.value)
@@ -117,6 +123,7 @@ const SignUpAction = async () => {
       alert(err.message)
     }
   }
+  loading.value = false
 }
 
 const emit = defineEmits(['changeLoginView'])

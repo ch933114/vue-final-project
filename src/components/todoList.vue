@@ -117,7 +117,7 @@ const tabs = [
 ]
 
 const addTodoHandler = (item) => {
-  if (item === '') {
+  if (item.trim() === '') {
     window.alert('請填寫待辦事項內容')
     return
   }

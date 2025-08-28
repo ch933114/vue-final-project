@@ -4,6 +4,7 @@ import { useUserStore } from './user'
 import axios from 'axios'
 
 export const useTodolistStore = defineStore('todoList', () => {
+  const loading = ref(false)
   const userStore = useUserStore()
   const { token } = storeToRefs(userStore)
   const url = 'https://todolist-api.hexschool.io'
@@ -11,6 +12,7 @@ export const useTodolistStore = defineStore('todoList', () => {
 
   // 取得 todos
   const fetchTodos = async () => {
+    loading.value = true
     try {
       const res = await axios.get(`${url}/todos/`, {
         headers: {
@@ -21,10 +23,12 @@ export const useTodolistStore = defineStore('todoList', () => {
     } catch (err) {
       console.error('Error:', err.response?.data || err.message)
     }
+    loading.value = false
   }
 
   // 新增 todo
   const addTodo = async (item) => {
+    loading.value = true
     try {
       const res = await axios.post(
         `${url}/todos/`,
@@ -39,10 +43,12 @@ export const useTodolistStore = defineStore('todoList', () => {
     } catch (err) {
       console.error('Error:', err.response?.data || err.message)
     }
+    loading.value = false
   }
 
   // 移除 todo
   const removeTodo = async (item) => {
+    loading.value = true
     try {
       await axios.delete(`${url}/todos/${item.id}`, {
         headers: {
@@ -53,10 +59,12 @@ export const useTodolistStore = defineStore('todoList', () => {
     } catch (err) {
       console.error('Error:', err.response?.data || err.message)
     }
+    loading.value = false
   }
 
   // 修改 todo 完成狀態
   const toggleStatus = async (item) => {
+    loading.value = true
     try {
       const res = await axios.patch(
         `${url}/todos/${item.id}/toggle`,
@@ -75,10 +83,12 @@ export const useTodolistStore = defineStore('todoList', () => {
     } catch (err) {
       console.error('Error:', err.response?.data || err.message)
     }
+    loading.value = false
   }
 
   // 更新 todo 的 content
   const updateTodo = async (item) => {
+    loading.value = true
     try {
       await axios.put(
         `${url}/todos/${item.id}`,
@@ -94,6 +104,7 @@ export const useTodolistStore = defineStore('todoList', () => {
     } catch (err) {
       console.error(err)
     }
+    loading.value = false
   }
 
   // 計算未完成 todos 數量
@@ -101,5 +112,14 @@ export const useTodolistStore = defineStore('todoList', () => {
     return todoData.value.filter((a) => a.status === false).length
   })
 
-  return { todoData, addTodo, removeTodo, undoneTodo, fetchTodos, toggleStatus, updateTodo }
+  return {
+    todoData,
+    addTodo,
+    removeTodo,
+    undoneTodo,
+    fetchTodos,
+    toggleStatus,
+    updateTodo,
+    loading,
+  }
 })

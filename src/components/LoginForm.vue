@@ -39,6 +39,8 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
+import { useTodolistStore } from '@/stores/todoList'
+import { storeToRefs } from 'pinia'
 
 const api = 'https://todolist-api.hexschool.io/'
 
@@ -53,6 +55,8 @@ const emailError = ref('')
 const passwordError = ref('')
 
 const userStore = useUserStore()
+const todolistStore = useTodolistStore()
+const { loading } = storeToRefs(todolistStore)
 
 const loginAction = async () => {
   let hasError = false
@@ -73,6 +77,7 @@ const loginAction = async () => {
 
   if (hasError) return
 
+  loading.value = true
   try {
     const response = await axios.post(`${api}users/sign_in`, loginData.value)
     // 把 token 與使用者資訊存進 Pinia
@@ -93,6 +98,7 @@ const loginAction = async () => {
       alert(err.message)
     }
   }
+  loading.value = false
 }
 
 const emit = defineEmits(['changeLoginView'])
